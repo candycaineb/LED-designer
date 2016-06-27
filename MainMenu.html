@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title></title>
+</head>
+<body>
+    <table width="100%">
+        <tr>
+            <th width="35%">LED Customizer</th>
+            <th width="65%">LED Strand Visualizer</th>
+        </tr>
+        <tr>
+            <th>
+                <a >Color :</a>
+                <select name="Colors" style="width:50%" onchange="color = this.value">
+                    <option value="gray">None</option>
+                    <option value="red">Red</option>
+                    <option value ="blue">Blue</option>
+                    <option value="white">White</option>
+                    <option value="green">Green</option>
+                    <option value="yellow">Yellow</option>
+                </select><br />
+
+                <a>Max Brightness :</a>
+                <input type="range" id="Brightness" value="50" min="10"  style="vertical-align:bottom" onmousemove="MaxBrightness = this.value; brightnessText.text = this.value + '%'">
+                <a id="brightnessText" >50%</a>
+            </th>
+            <th rowspan="2">
+                <canvas id="LEDs"></canvas>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <a>Effects :</a> <br>
+                <input type="checkbox" name="vehicle" value="Bike"> Theatre Chase<br>
+                <input type="checkbox" name="vehicle" value="Car" onchange="EffectsArray[0].Function()"> Fade<br>
+                
+            </th>
+        </tr>
+    </table>
+
+</body>
+</html>
+<script>
+    var c = document.getElementById("LEDs");
+    c.style.width = '100%';
+    
+    var ctx = c.getContext("2d");
+    var MaxBrightness = 50
+    var color = "gray"
+    var LedColorArray = new Array(10);
+    var EffectsArray = [{ "Name": "Fade", "Function": FadeEffect, "IsOn":false, "Delay":500 }];
+
+    ctx.lineWidth = "2";
+    ctx.strokeStyle = "black"
+    Update();
+    
+    function Update() {
+        ctx.clearRect(0, 0, c.width, c.height)
+        
+        ctx.fillStyle = "#545454";
+        ctx.fillRect(0, 0, c.width, c.height)
+
+        ctx.fillStyle = color;
+        for (t = 0; t < LedColorArray.length; t++) {
+            
+
+            ctx.beginPath()
+            ctx.strokeRect(5 + 30 * t, 40, 20, 20);
+            ctx.stroke();
+
+            ctx.arc(15 + 30 * t, 50, 10, 0,  2* Math.PI);
+            ctx.stroke();
+            ctx.fill();
+           
+            if (color != "gray"){
+                ctx.arc(15 + 30 * t, 50, 10 + MaxBrightness/3, 0, 2 * Math.PI);
+                ctx.globalAlpha = .3;
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+        }
+        setTimeout(Update, 100)
+    }
+
+    function FadeEffect() {
+        color = "red"
+    }
+    function TheatreChaseEffect() {
+
+    }
+
+    
+</script>
