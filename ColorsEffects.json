@@ -1,0 +1,19 @@
+﻿{
+    "Colors": [
+        { "Name": "None", "Value": "gray"},
+        { "Name": "Blue", "Value": "blue"},
+        { "Name": "Cyan", "Value": "cyan"},
+        { "Name": "Green", "Value": "green"},
+        { "Name": "Orange", "Value": "orange"},
+        { "Name": "Pink", "Value": "pink"},
+        { "Name": "Purple", "Value": "purple"},
+        { "Name": "Red", "Value": "red"},
+        { "Name": "White", "Value": "white"},
+        { "Name": "Yellow", "Value": "yellow"}
+
+    ],
+    "Effects" : [
+        { "Name": "Fade", "Value": "fade", "IgnoresColor": "false", "DefaultDelay": 100},
+        { "Name": "Theater Chase", "Value": "theaterChase", "IgnoresColor": "false", "DefaultDelay": 100}
+    ]
+}

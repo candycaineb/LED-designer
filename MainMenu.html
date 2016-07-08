@@ -12,19 +12,18 @@
         </tr>
         <tr>
             <th>
-                <a >Color :</a>
-                <select name="Colors" style="width:50%" onchange="color = this.value">
-                    <option value="gray">None</option>
-                    <option value="red">Red</option>
-                    <option value ="blue">Blue</option>
-                    <option value="white">White</option>
-                    <option value="green">Green</option>
-                    <option value="yellow">Yellow</option>
-                </select><br />
+                <a id="tet">1st Color :</a>
+                <select id="Color1" name="Colors" style="width:50%"  onchange="color1 = this.value">
+                </select><br /><br />
+                <a>2nd Color :</a>
+                <select id="Color2" name="Colors2" style="width:50%" onchange="color2 = this.value">
+                </select>
+                
+                <br />
 
-                <a>Max Brightness :</a>
+                <!--<a>Max Brightness :</a>
                 <input type="range" id="Brightness" value="50" min="10"  style="vertical-align:bottom" onmousemove="MaxBrightness = this.value; brightnessText.text = this.value + '%'">
-                <a id="brightnessText" >50%</a>
+                <a id="brightnessText" >50%</a>-->
             </th>
             <th rowspan="2">
                 <canvas id="LEDs"></canvas>
@@ -34,7 +33,7 @@
             <th>
                 <a>Effects :</a> <br>
                 <input type="checkbox" name="vehicle" value="Bike"> Theatre Chase<br>
-                <input type="checkbox" name="vehicle" value="Car" onchange="EffectsArray[0].Function()"> Fade<br>
+                <input type="checkbox" name="vehicle" value="0" onchange="changeEffect(this.value)"> Fade<br>
                 
             </th>
         </tr>
@@ -42,16 +41,53 @@
 
 </body>
 </html>
+
+<script >
+    var colorsArray = [];
+    var arr = {};
+    var text = {"Colors":[],"Effects":[]};
+    var xobj = new XMLHttpRequest();
+    xobj.overrideMimeType("application/json");
+   
+    xobj.open('GET', './ColorsEffects.json', true);
+    xobj.onreadystatechange = function () {
+        if (xobj.readyState == 4 && xobj.status == "200") {
+            arr = JSON.parse(xobj.responseText);
+            PaintBackground("Color1");
+            PaintBackground("Color2");
+            console.log(arr)
+        }
+    };
+    xobj.send(null); 
+    
+    function PaintBackground(id) {
+        var out = "";
+        var i;
+
+        for (i = 0; i < arr.Colors.length; i++) {
+            out += '<option value="' + arr.Colors[i].Value + '">' + arr.Colors[i].Name + '</option>'
+        }
+        document.getElementById(id).innerHTML = out;
+        
+        
+    }
+    
+    
+</script>
+
+
 <script>
     var c = document.getElementById("LEDs");
     c.style.width = '100%';
     
     var ctx = c.getContext("2d");
-    var MaxBrightness = 50
-    var color = "gray"
+    //var MaxBrightness = 50
+    var color1 = "gray"
+    var color2 = "gray"
     var LedColorArray = new Array(10);
-    var EffectsArray = [{ "Name": "Fade", "Function": FadeEffect, "IsOn":false, "Delay":500 }];
-
+    var EffectsArray = [{ "Name": "Theatre Chase", "Function": TheatreChaseEffect, "IsOn": false, "Delay": 100 }];
+    var SelectedEffect = -1;
+    var counter = 0
     ctx.lineWidth = "2";
     ctx.strokeStyle = "black"
     Update();
@@ -62,9 +98,16 @@
         ctx.fillStyle = "#545454";
         ctx.fillRect(0, 0, c.width, c.height)
 
-        ctx.fillStyle = color;
+        for (t = 0; t < LedColorArray.length; t++)
+            LedColorArray[t] = color1;
+
+        if (SelectedEffect != -1)
+            EffectsArray[SelectedEffect].Function(LedColorArray);
+        
+
         for (t = 0; t < LedColorArray.length; t++) {
             
+            ctx.fillStyle = LedColorArray[t]
 
             ctx.beginPath()
             ctx.strokeRect(5 + 30 * t, 40, 20, 20);
@@ -74,21 +117,40 @@
             ctx.stroke();
             ctx.fill();
            
-            if (color != "gray"){
-                ctx.arc(15 + 30 * t, 50, 10 + MaxBrightness/3, 0, 2 * Math.PI);
+            if (LedColorArray[t] != "gray") {
+                ctx.arc(15 + 30 * t, 50, 10 + 50/3, 0, 2 * Math.PI);
                 ctx.globalAlpha = .3;
                 ctx.fill();
             }
             ctx.globalAlpha = 1;
         }
-        setTimeout(Update, 100)
+        counter++;
+
+        if (SelectedEffect != -1)
+            setTimeout(Update, EffectsArray[SelectedEffect].Delay);
+        else {
+            setTimeout(Update, 100);
+        }
+        
+    }
+
+    function changeEffect(t) {
+        SelectedEffect = t;
+        counter = 0;
     }
 
     function FadeEffect() {
-        color = "red"
+        color1 = "red"
     }
-    function TheatreChaseEffect() {
-
+    function TheatreChaseEffect(LEDs) {
+        if (counter >= 3)
+            counter = 0;
+        
+        for (t = 0; t < LEDs.length; t++) {
+            if (t % 3 != counter)
+                LEDs[t] = "gray"
+        }
+        
     }
 
     
